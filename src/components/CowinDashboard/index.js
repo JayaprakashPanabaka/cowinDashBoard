@@ -4,7 +4,7 @@ import Loader from 'react-loader-spinner'
 
 import VaccinationByAge from '../VaccinationByAge/index'
 import VaccinationByGender from '../VaccinationByGender/index'
-import VaccinationByCoverage from '../VaccinationCoverage/index'
+import VaccinationCoverage from '../VaccinationCoverage/index'
 import './index.css'
 
 const apiStatusConstants = {
@@ -21,42 +21,43 @@ const CowinDashboard = () => {
   //   console.log(apiStatus)
 
   const vaccinationDataApiUrl = 'https://apis.ccbp.in/covid-vaccination-data'
-
-  const getVaccinationData = async () => {
-    setApiStatus(apiStatusConstants.inProgress)
-
-    const response = await fetch(vaccinationDataApiUrl)
-
-    if (response.ok === true) {
-      const jsonData = await response.json()
-      //   console.log(jsonData.last_7_days_vaccination)
-      const updatedData = {
-        last7DaysVaccination: jsonData.last_7_days_vaccination.map(
-          eachDayData => ({
-            vaccinationDate: eachDayData.vaccination_date,
-            dose1: eachDayData.dose_1,
-            dose2: eachDayData.dose_2,
-          }),
-        ),
-
-        vaccinationByAge: jsonData.vaccination_by_age.map(range => ({
-          age: range.age,
-          count: range.count,
-        })),
-
-        vaccinationByGender: jsonData.vaccination_by_gender.map(genderType => ({
-          gender: genderType.gender,
-          count: genderType.count,
-        })),
-      }
-      setVaccinationData(updatedData)
-      setApiStatus(apiStatusConstants.success)
-    } else {
-      setApiStatus(apiStatusConstants.failure)
-    }
-  }
-
   useEffect(() => {
+    const getVaccinationData = async () => {
+      setApiStatus(apiStatusConstants.inProgress)
+
+      const response = await fetch(vaccinationDataApiUrl)
+
+      if (response.ok === true) {
+        const jsonData = await response.json()
+        //   console.log(jsonData.last_7_days_vaccination)
+        const updatedData = {
+          last7DaysVaccination: jsonData.last_7_days_vaccination.map(
+            eachDayData => ({
+              vaccinationDate: eachDayData.vaccination_date,
+              dose1: eachDayData.dose_1,
+              dose2: eachDayData.dose_2,
+            }),
+          ),
+
+          vaccinationByAge: jsonData.vaccination_by_age.map(range => ({
+            age: range.age,
+            count: range.count,
+          })),
+
+          vaccinationByGender: jsonData.vaccination_by_gender.map(
+            genderType => ({
+              gender: genderType.gender,
+              count: genderType.count,
+            }),
+          ),
+        }
+        setVaccinationData(updatedData)
+        setApiStatus(apiStatusConstants.success)
+      } else {
+        setApiStatus(apiStatusConstants.failure)
+      }
+    }
+
     getVaccinationData()
   }, [])
 
@@ -81,14 +82,14 @@ const CowinDashboard = () => {
 
   const renderVaccinationStats = () => (
     <>
-      <VaccinationByCoverage
+      <VaccinationCoverage
         vaccinationCoverageDetails={vaccinationData.last7DaysVaccination}
       />
       <VaccinationByGender
-        vaccinationGenderDetails={vaccinationData.vaccinationByGender}
+        vaccinationByGenderDetails={vaccinationData.vaccinationByGender}
       />
       <VaccinationByAge
-        vaccinationAgeDetails={vaccinationData.vaccinationByAge}
+        vaccinationByAgeDetails={vaccinationData.vaccinationByAge}
       />
     </>
   )
